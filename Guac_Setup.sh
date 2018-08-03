@@ -4,8 +4,12 @@
 
 #!/bin/bash
 
+#Set color variables.
+RED='\033[0;31m'
+NC='\033[0m'
+
 #Install docker:
-echo "Installing Docker"
+echo "${RED}Installing Docker${NC}"
 apt-get update
 apt-get install -y linux-image-extra-$(uname -r) linux-image-extra-virtual
 apt-get install -y apt-transport-https ca-certificates curl software-properties-common
