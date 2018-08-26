@@ -69,7 +69,8 @@ docker run --name guac-postgres -d postgres
 echo -e "${RED}Waiting For guac-postgres To Start${NC}"
 sleep 3
 echo -e "${RED}guac-postgres Container Started${NC}"
-docker cp initdb.sql guac-postgres:/guac_db.sql > /dev/null 2>&1
+docker cp /tmp/initdb.sql guac-postgres:/guac_db.sql > /dev/null 2>&1
+rm /tmp/initdb.sql > /dev/null 2>&1
 echo -e "${RED}Creating guacamole_db Database${NC}"
 docker exec -it guac-postgres createdb guacamole_db -U postgres > /dev/null 2>&1
 echo -e "${RED}Creating guacamole_db Schema${NC}"
