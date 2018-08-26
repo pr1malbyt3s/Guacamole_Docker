@@ -10,21 +10,21 @@ NC='\033[0m'
 
 #Install docker:
 echo -e "${RED}Installing Docker${NC}"
-apt-get update > /dev/null 2>&1
-apt-get install -y linux-image-extra-$(uname -r) linux-image-extra-virtual > /dev/null 2>&1
-apt-get install -y apt-transport-https ca-certificates curl software-properties-common > /dev/null 2>&1
-curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add - > /dev/null 2>&1
-add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" > /dev/null 2>&1
-apt-get update > /dev/null 2>&1
-apt-cache policy docker-ce > /dev/null 2>&1
-apt-get install -y docker-ce > /dev/null 2>&1
-systemctl enable docker > /dev/null 2>&1
+apt-get update
+apt-get install -y linux-image-extra-$(uname -r) linux-image-extra-virtual
+apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
+apt-get update
+apt-cache policy docker-ce
+apt-get install -y docker-ce
+systemctl enable docker
 
 #Pull docker images:
 echo -e "${RED}Pulling Docker Images Needed${NC}"
-docker pull guacamole/guacd > /dev/null 2>&1
-docker pull guacamole/guacamole > /dev/null 2>&1
-docker pull postgres > /dev/null 2>&1
+docker pull guacamole/guacd
+docker pull guacamole/guacamole
+docker pull postgres
 
 #Start Guacamole installation.
 echo -e "${RED}Starting Guacamole Installation${NC}"
@@ -42,7 +42,6 @@ docker rm guac-postgres > /dev/null 2>&1
 
 #Create PostgreSQL database file.
 echo -e "${RED}Building PostgreSQL Database File${NC}"
-#rm /tmp/initdb.sql > /dev/null 2>&1
 docker run --rm guacamole/guacamole /opt/guacamole/bin/initdb.sh --postgres > initdb.sql
 
 #Get input for username and password that will be used by Guacamole to connect to database.
@@ -70,7 +69,6 @@ echo -e "${RED}Waiting For guac-postgres To Start${NC}"
 sleep 3
 echo -e "${RED}guac-postgres Container Started${NC}"
 docker cp initdb.sql guac-postgres:/guac_db.sql
-#rm /tmp/initdb.sql > /dev/null 2>&1
 echo -e "${RED}Creating guacamole_db Database${NC}"
 docker exec -it guac-postgres createdb guacamole_db -U postgres
 echo -e "${RED}Creating guacamole_db Schema${NC}"
