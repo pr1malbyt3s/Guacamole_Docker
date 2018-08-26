@@ -43,7 +43,7 @@ docker rm guac-postgres > /dev/null 2>&1
 #Create PostgreSQL database file.
 echo -e "${RED}Building PostgreSQL Database File${NC}"
 #rm /tmp/initdb.sql > /dev/null 2>&1
-docker run --rm guacamole/guacamole /opt/guacamole/bin/initdb.sh --postgres > /tmp/initdb.sql
+docker run --rm guacamole/guacamole /opt/guacamole/bin/initdb.sh --postgres > initdb.sql
 
 #Get input for username and password that will be used by Guacamole to connect to database.
 echo -e "${RED}Please Follow Credentials Prompt To Finish Database Setup${NC}"
@@ -69,7 +69,7 @@ docker run --name guac-postgres -d postgres
 echo -e "${RED}Waiting For guac-postgres To Start${NC}"
 sleep 3
 echo -e "${RED}guac-postgres Container Started${NC}"
-docker cp /tmp/initdb.sql guac-postgres:/guac_db.sql
+docker cp initdb.sql guac-postgres:/guac_db.sql
 #rm /tmp/initdb.sql > /dev/null 2>&1
 echo -e "${RED}Creating guacamole_db Database${NC}"
 docker exec -it guac-postgres createdb guacamole_db -U postgres
