@@ -9,7 +9,7 @@ RED='\033[0;31m'
 NC='\033[0m'
 
 #Install docker:
-echo "${RED}Installing Docker${NC}"
+echo -e "${RED}Installing Docker${NC}"
 apt-get update
 apt-get install -y linux-image-extra-$(uname -r) linux-image-extra-virtual
 apt-get install -y apt-transport-https ca-certificates curl software-properties-common
@@ -21,15 +21,15 @@ apt-get install -y docker-ce
 systemctl enable docker
 
 #Pull docker images:
-echo "Pulling Docker images needed."
+echo -e "${RED}Pulling Docker Images Needed${NC}"
 docker pull guacamole/guacd
 docker pull guacamole/guacamole
 docker pull postgres
 
 #Start Guacamole installation.
-echo "Starting Guacamole installation."
+echo -e "${RED}Starting Guacamole Installation${NC}"
 #Stop any containers that are running under the same name as ones that will be initialized.
-echo "Stopping any redundant containers."
+echo -e "${RED}Stopping Any Redundant Containers${NC}"
 docker stop guacd > /dev/null 2>&1
 sleep 2
 docker stop guacamole > /dev/null 2>&1
@@ -41,10 +41,11 @@ docker rm guacamole > /dev/null 2>&1
 docker rm guac-postgres > /dev/null 2>&1
 
 #Create PostgreSQL database file.
-echo "Building PostgreSQL database file."
+echo -e "${RED}Building PostgreSQL Database File${NC}"
 docker run --rm guacamole/guacamole /opt/guacamole/bin/initdb.sh --postgres > initdb.sql
 
 #Get input for username and password that will be used by Guacamole to connect to database.
+echo -e "${RED}Please Follow Credentials Prompt To Finish Database Setup${NC}"
 while true
 do
         read -p 'Enter Guacamole Database Username: ' guacuser
@@ -62,32 +63,35 @@ done
 guacpass="'$guacpass1'"
 
 #Setup and initialize guac-postgres container.
-echo "Starting guac-postgres container."
+echo -e "${RED}Starting guac-postgres Container${NC}"
 docker run --name guac-postgres -d postgres
-echo "Waiting for guac-postgres to start."
+echo -e "${RED}Waiting For guac-postgres To Start${NC}"
 sleep 3
-echo "guac-postgres container started."
+echo -e "${RED}guac-postgres Container Started${NC}"
 docker cp initdb.sql guac-postgres:/guac_db.sql
-echo "Creating guacamole_db database."
+echo -e "${RED}Creating guacamole_db Database${NC}"
 docker exec -it guac-postgres createdb guacamole_db -U postgres
-echo "Creating guacamole_db schema."
+echo -e "${RED}Creating guacamole_db Schema${NC}"
 docker exec -it guac-postgres bash -c "cat guac_db.sql | psql -d guacamole_db -U postgres -f -"
-echo "Creating database file for user $guacuser."
+echo -e "${RED}Creating Database File For User $guacuser${NC}"
 docker exec -it guac-postgres psql -d guacamole_db -U postgres -c "CREATE USER $guacuser WITH PASSWORD $guacpass;"
 docker exec -it guac-postgres psql -d guacamole_db -U postgres -c "GRANT SELECT,INSERT,UPDATE,DELETE ON ALL TABLES IN SCHEMA public TO $guacuser;"
 docker exec -it guac-postgres psql -d guacamole_db -U postgres -c "GRANT SELECT,USAGE ON ALL SEQUENCES IN SCHEMA public TO $guacuser;"
-echo "guac-postgres setup complete."
+echo -e "${RED}guac-postgres Setup Complete${NC}"
 
 #Initialize guacd container.
-echo "Starting guacd container."
+echo -e "${RED}Starting guacd Container${NC}"
 docker run --name guacd --restart=always -d guacamole/guacd
-echo "guacd container started."
+echo -e "${RED}guacd Container Started${NC}"
 
 #Initialize guacamole container.
-echo "Starting guacamole container."
+echo -e "${RED}Starting guacamole Container${NC}"
 docker run --name guacamole --link guacd:guacd --link guac-postgres:postgres \
 -e POSTGRES_DATABASE=guacamole_db \
 -e POSTGRES_USER=$guacuser \
 -e POSTGRES_PASSWORD=$guacpass \
 --restart=always -d -p 127.0.0.1:8080:8080 guacamole/guacamole
-echo "Gucamole container started."
+echo -e "${RED}guacamole Container Started${NC}"
+
+#Installation complete.
+echo -e "${RED}Installation Complete. Enjoy!${NC}"
