@@ -64,7 +64,7 @@ guacpass="'$guacpass1'"
 
 #Setup and initialize guac-postgres container.
 echo -e "${RED}Starting guac-postgres Container${NC}"
-docker run --name guac-postgres -d postgres
+docker run --name guac-postgres --restart=always -d postgres
 echo -e "${RED}Waiting For guac-postgres To Start${NC}"
 sleep 3
 echo -e "${RED}guac-postgres Container Started${NC}"
