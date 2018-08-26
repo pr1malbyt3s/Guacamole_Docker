@@ -42,7 +42,7 @@ docker rm guac-postgres > /dev/null 2>&1
 
 #Create PostgreSQL database file.
 echo -e "${RED}Building PostgreSQL Database File${NC}"
-rm /tmp/initdb.sql > /dev/null 2>&1
+#rm /tmp/initdb.sql > /dev/null 2>&1
 docker run --rm guacamole/guacamole /opt/guacamole/bin/initdb.sh --postgres > /tmp/initdb.sql
 
 #Get input for username and password that will be used by Guacamole to connect to database.
@@ -69,16 +69,16 @@ docker run --name guac-postgres -d postgres
 echo -e "${RED}Waiting For guac-postgres To Start${NC}"
 sleep 3
 echo -e "${RED}guac-postgres Container Started${NC}"
-docker cp /tmp/initdb.sql guac-postgres:/guac_db.sql > /dev/null 2>&1
+docker cp /tmp/initdb.sql guac-postgres:/guac_db.sql
 #rm /tmp/initdb.sql > /dev/null 2>&1
 echo -e "${RED}Creating guacamole_db Database${NC}"
-docker exec -it guac-postgres createdb guacamole_db -U postgres > /dev/null 2>&1
+docker exec -it guac-postgres createdb guacamole_db -U postgres
 echo -e "${RED}Creating guacamole_db Schema${NC}"
-docker exec -it guac-postgres bash -c "cat guac_db.sql | psql -d guacamole_db -U postgres -f -" > /dev/null 2>&1
+docker exec -it guac-postgres bash -c "cat guac_db.sql | psql -d guacamole_db -U postgres -f -"
 echo -e "${RED}Creating Database File For User $guacuser${NC}"
-docker exec -it guac-postgres psql -d guacamole_db -U postgres -c "CREATE USER $guacuser WITH PASSWORD $guacpass;" > /dev/null 2>&1
-docker exec -it guac-postgres psql -d guacamole_db -U postgres -c "GRANT SELECT,INSERT,UPDATE,DELETE ON ALL TABLES IN SCHEMA public TO $guacuser;" > /dev/null 2>&1
-docker exec -it guac-postgres psql -d guacamole_db -U postgres -c "GRANT SELECT,USAGE ON ALL SEQUENCES IN SCHEMA public TO $guacuser;" > /dev/null 2>&1
+docker exec -it guac-postgres psql -d guacamole_db -U postgres -c "CREATE USER $guacuser WITH PASSWORD $guacpass;"
+docker exec -it guac-postgres psql -d guacamole_db -U postgres -c "GRANT SELECT,INSERT,UPDATE,DELETE ON ALL TABLES IN SCHEMA public TO $guacuser;"
+docker exec -it guac-postgres psql -d guacamole_db -U postgres -c "GRANT SELECT,USAGE ON ALL SEQUENCES IN SCHEMA public TO $guacuser;"
 echo -e "${RED}guac-postgres Setup Complete${NC}"
 
 #Initialize guacd container.
