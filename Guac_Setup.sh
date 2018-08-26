@@ -4,44 +4,27 @@
 
 #!/bin/bash
 
-pid=$! # Process Id of the previous running command
-
-spin[0]="-"
-spin[1]="\\"
-spin[2]="|"
-spin[3]="/"
-
-echo -n "[copying] ${spin[0]}"
-while [ kill -0 $pid ]
-do
-  for i in "${spin[@]}"
-  do
-        echo -ne "\b$i"
-        sleep 0.1
-  done
-done
-
 #Set color variables.
 RED='\033[0;31m'
 NC='\033[0m'
 
 #Install docker:
 echo -e "${RED}Installing Docker${NC}"
-apt-get update
-apt-get install -y linux-image-extra-$(uname -r) linux-image-extra-virtual
-apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
-add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
-apt-get update
-apt-cache policy docker-ce
-apt-get install -y docker-ce
-systemctl enable docker
+apt-get update > /dev/null 2>&1
+apt-get install -y linux-image-extra-$(uname -r) linux-image-extra-virtual > /dev/null 2>&1
+apt-get install -y apt-transport-https ca-certificates curl software-properties-common > /dev/null 2>&1
+curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add - > /dev/null 2>&1
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" > /dev/null 2>&1
+apt-get update > /dev/null 2>&1
+apt-cache policy docker-ce > /dev/null 2>&1
+apt-get install -y docker-ce > /dev/null 2>&1
+systemctl enable docker > /dev/null 2>&1
 
 #Pull docker images:
 echo -e "${RED}Pulling Docker Images Needed${NC}"
-docker pull guacamole/guacd
-docker pull guacamole/guacamole
-docker pull postgres
+docker pull guacamole/guacd > /dev/null 2>&1
+docker pull guacamole/guacamole > /dev/null 2>&1
+docker pull postgres > /dev/null 2>&1
 
 #Start Guacamole installation.
 echo -e "${RED}Starting Guacamole Installation${NC}"
@@ -86,15 +69,15 @@ docker run --name guac-postgres -d postgres
 echo -e "${RED}Waiting For guac-postgres To Start${NC}"
 sleep 3
 echo -e "${RED}guac-postgres Container Started${NC}"
-docker cp initdb.sql guac-postgres:/guac_db.sql
+docker cp initdb.sql guac-postgres:/guac_db.sql > /dev/null 2>&1
 echo -e "${RED}Creating guacamole_db Database${NC}"
-docker exec -it guac-postgres createdb guacamole_db -U postgres
+docker exec -it guac-postgres createdb guacamole_db -U postgres > /dev/null 2>&1
 echo -e "${RED}Creating guacamole_db Schema${NC}"
-docker exec -it guac-postgres bash -c "cat guac_db.sql | psql -d guacamole_db -U postgres -f -"
+docker exec -it guac-postgres bash -c "cat guac_db.sql | psql -d guacamole_db -U postgres -f -" > /dev/null 2>&1
 echo -e "${RED}Creating Database File For User $guacuser${NC}"
-docker exec -it guac-postgres psql -d guacamole_db -U postgres -c "CREATE USER $guacuser WITH PASSWORD $guacpass;"
-docker exec -it guac-postgres psql -d guacamole_db -U postgres -c "GRANT SELECT,INSERT,UPDATE,DELETE ON ALL TABLES IN SCHEMA public TO $guacuser;"
-docker exec -it guac-postgres psql -d guacamole_db -U postgres -c "GRANT SELECT,USAGE ON ALL SEQUENCES IN SCHEMA public TO $guacuser;"
+docker exec -it guac-postgres psql -d guacamole_db -U postgres -c "CREATE USER $guacuser WITH PASSWORD $guacpass;" > /dev/null 2>&1
+docker exec -it guac-postgres psql -d guacamole_db -U postgres -c "GRANT SELECT,INSERT,UPDATE,DELETE ON ALL TABLES IN SCHEMA public TO $guacuser;" > /dev/null 2>&1
+docker exec -it guac-postgres psql -d guacamole_db -U postgres -c "GRANT SELECT,USAGE ON ALL SEQUENCES IN SCHEMA public TO $guacuser;" > /dev/null 2>&1
 echo -e "${RED}guac-postgres Setup Complete${NC}"
 
 #Initialize guacd container.
